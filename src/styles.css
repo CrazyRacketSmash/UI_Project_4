@@ -1,0 +1,87 @@
+:root{
+  --bg: #f6fbff;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --accent: #4f9ce8;
+  --success: #60a5fa;
+  --glass: rgba(255,255,255,0.7);
+  --radius: 14px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+* { box-sizing: border-box; }
+html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6fbff,#eef8ff); color: #0f172a; }
+
+.app {
+  min-height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 2rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.06);
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+.h-title { font-size: 1.35rem; margin:0; }
+.h-sub { color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+
+.mood-grid { display:grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 1rem; }
+.mood-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: linear-gradient(180deg,var(--glass),transparent);
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.mood-btn:active { transform: translateY(2px); }
+.mood-icon { font-size: 20px; }
+.mood-label { font-size: 0.9rem; color: #0f172a; }
+
+.actions { display:flex; justify-content:flex-end; margin-top:16px; gap:8px; }
+.btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight:600;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: white; box-shadow: 0 6px 18px rgba(79,156,232,0.18); }
+.btn-ghost { background: transparent; color: var(--muted); border:1px solid rgba(15,23,42,0.05); }
+
+.center { text-align:center; }
+
+.breath-wrapper {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 18px;
+  padding: 1rem;
+}
+.breath-circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.06), inset 0 6px 20px rgba(255,255,255,0.2);
+}
+.breath-text { font-size: 1.1rem; color: var(--muted); }
+
+.small { font-size: 0.9rem; color:var(--muted); }
