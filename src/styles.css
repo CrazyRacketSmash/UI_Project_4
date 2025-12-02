@@ -13,16 +13,14 @@
 html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6fbff,#eef8ff); color: #0f172a; }
 
 .app {
-  min-height: 100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding: 2rem;
 }
 
 .container {
   width: 100%;
-  max-width: 520px;
+  height: 100%;
   background: var(--card);
   border-radius: var(--radius);
   padding: 2rem;
@@ -80,7 +78,6 @@ html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow: 0 8px 30px rgba(16,24,40,0.06), inset 0 6px 20px rgba(255,255,255,0.2);
 }
 .breath-text { font-size: 1.1rem; color: var(--muted); }
 
