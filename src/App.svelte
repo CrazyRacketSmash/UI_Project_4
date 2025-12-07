@@ -55,11 +55,11 @@
       stage = id;
       try {
         if (id === 'whale') { whaleNotes = localStorage.getItem('whale_notes') || ''; whaleSaved = !!whaleNotes; }
-        else if (id === 'rabbit') { rabbitNotes = localStorage.getItem('rabbit_notes') || ''; rabbitSaved = !!rabbitNotes; }
+        else if (id === 'rabbit') { rabbitSaved = !!localStorage.getItem('rabbit_cards'); }
         else if (id === 'bird') { birdNotes = localStorage.getItem('bird_notes') || ''; birdSaved = !!birdNotes; }
       } catch (e) {
         if (id === 'whale') { whaleNotes = ''; whaleSaved = false; }
-        if (id === 'rabbit') { rabbitNotes = ''; rabbitSaved = false; }
+        if (id === 'rabbit') { rabbitSaved = false; }
         if (id === 'bird') { birdNotes = ''; birdSaved = false; }
       }
       return;
