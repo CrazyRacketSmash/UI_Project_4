@@ -3,6 +3,9 @@
   import StressedBreathing from './components/stressed/Breathing.svelte';
   import StressedPMR from './components/stressed/PMR.svelte';
   import StressedTidy from './components/stressed/Tidy.svelte';
+  import Whale from './components/Whale.svelte';
+  import Rabbit from './components/Rabbit.svelte';
+  import Bird from './components/Bird.svelte';
 
   let stage = 'picker'; // 'picker' | 'tools' | 'breath' | 'done' | 'pmr' | 'grounding' | 'meditation' | 'journal' | 'spinner'
   let mood = null;
@@ -46,6 +49,22 @@
 
   function onChoose(selected) {
     mood = selected;
+    // quick route for the cute helpers
+    if (mood.id === 'whale' || mood.id === 'rabbit' || mood.id === 'bird') {
+      const id = mood.id;
+      stage = id;
+      try {
+        if (id === 'whale') { whaleNotes = localStorage.getItem('whale_notes') || ''; whaleSaved = !!whaleNotes; }
+        else if (id === 'rabbit') { rabbitNotes = localStorage.getItem('rabbit_notes') || ''; rabbitSaved = !!rabbitNotes; }
+        else if (id === 'bird') { birdNotes = localStorage.getItem('bird_notes') || ''; birdSaved = !!birdNotes; }
+      } catch (e) {
+        if (id === 'whale') { whaleNotes = ''; whaleSaved = false; }
+        if (id === 'rabbit') { rabbitNotes = ''; rabbitSaved = false; }
+        if (id === 'bird') { birdNotes = ''; birdSaved = false; }
+      }
+      return;
+    }
+
     // prepare tailored items + default breathing configs
     if (mood.id === 'stressed' || mood.id === 'overwhelmed' || mood.id === 'lonely') {
       selectedTools = toolsByMood[mood.id] || [];
@@ -230,252 +249,308 @@
   let username = 'Huy';
   let avatarUrl = ''; // set to image path to use a real avatar; empty => show initials
 
+  // whale state (keeps a copy of saved notes in app if needed)
+  let whaleNotes = '';
+  let whaleSaved = false;
+  function handleWhaleSave(e) {
+    whaleNotes = e.detail || '';
+    whaleSaved = !!whaleNotes;
+  }
+  function backFromWhale() {
+    stage = 'picker';
+    mood = null;
+    whaleSaved = false;
+    whaleNotes = '';
+  }
+
+  // rabbit state
+  let rabbitNotes = '';
+  let rabbitSaved = false;
+  function handleRabbitSave(e) {
+    rabbitNotes = e.detail || '';
+    rabbitSaved = !!rabbitNotes;
+  }
+  function backFromRabbit() {
+    stage = 'picker';
+    mood = null;
+    rabbitSaved = false;
+    rabbitNotes = '';
+  }
+
+  // bird state
+  let birdNotes = '';
+  let birdSaved = false;
+  function handleBirdSave(e) {
+    birdNotes = e.detail || '';
+    birdSaved = !!birdNotes;
+  }
+  function backFromBird() {
+    stage = 'picker';
+    mood = null;
+    birdSaved = false;
+    birdNotes = '';
+  }
 </script>
 
 <div class="app">
-  <div class="container" role="main" aria-labelledby="main-title">
-    <!-- header: hide when a mood is selected -->
-    {#if !mood}
-      <div class="header">
-        <div class="header-left">
-          <h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
-        </div>
-        <div class="header-right" role="navigation" aria-label="User">
-          <div class="welcome">Welcome,<span class="user-name">{username}</span></div>
-          <button class="avatar-btn" aria-label="Open profile" title="Profile">
-            {#if avatarUrl}
-              <img src={avatarUrl} alt="avatar" class="avatar" />
-            {:else}
-              <div class="avatar avatar-initials" aria-hidden="true">{username.slice(0,1).toUpperCase()}</div>
-            {/if}
-          </button>
-        </div>
-      </div>
-    {/if}
+	<div class="container" role="main" aria-labelledby="main-title">
+		<!-- header: hide when a mood is selected -->
+		{#if !mood}
+			<div class="header">
+				<div class="header-left">
+					<h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
+				</div>
+				<div class="header-right" role="navigation" aria-label="User">
+					<div class="welcome">Welcome,<span class="user-name">{username}</span></div>
+					<button class="avatar-btn" aria-label="Open profile" title="Profile">
+						{#if avatarUrl}
+							<img src={avatarUrl} alt="avatar" class="avatar" />
+						{:else}
+							<div class="avatar avatar-initials" aria-hidden="true">{username.slice(0,1).toUpperCase()}</div>
+						{/if}
+					</button>
+				</div>
+			</div>
+		{/if}
 
-    {#if stage === 'picker'}
-      <MoodPicker on:choose={(e) => onChoose(e.detail)} />
-    {:else if stage === 'tools'}
-      <!-- three-column layout: left list, center interactive pane, right archived pane -->
-      <div class="tools-layout">
-        <aside class="tools-sidebar">
-          <div style="padding:12px 8px;">
-            <div style="font-weight:600; margin-bottom:6px">{mood.label} — options</div>
-            <div class="small" style="color:#666; margin-bottom:10px">{suggestionText}</div>
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            {#each selectedTools as t}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <div class="tool-card" class:selected={selectedToolId === t.id} on:click={() => selectTool(t)} style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; margin-bottom:8px;">
-                <div>
-                  <div style="font-weight:600">{t.title}</div>
-                </div>
-                <div style="text-align:right">
-                  <div class="small" style="color:#777">{t.time}</div>
-                </div>
-              </div>
-            {/each}
-          </div>
-          <div style="padding:12px; border-top:1px solid #f0f0f0;">
-            <button class="btn btn-ghost" on:click={backToPicker}>Back</button>
-          </div>
-        </aside>
+		{#if stage === 'picker'}
+			<MoodPicker on:choose={(e) => onChoose(e.detail)} />
+		{:else if stage === 'tools'}
+			<!-- three-column layout: left list, center interactive pane, right archived pane -->
+			<div class="tools-layout">
+				<aside class="tools-sidebar">
+					<div style="padding:12px 8px;">
+						<div style="font-weight:600; margin-bottom:6px">{mood.label} — options</div>
+						<div class="small" style="color:#666; margin-bottom:10px">{suggestionText}</div>
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						{#each selectedTools as t}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<div class="tool-card" class:selected={selectedToolId === t.id} on:click={() => selectTool(t)} style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; margin-bottom:8px;">
+								<div>
+									<div style="font-weight:600">{t.title}</div>
+								</div>
+								<div style="text-align:right">
+									<div class="small" style="color:#777">{t.time}</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+					<div style="padding:12px; border-top:1px solid #f0f0f0;">
+						<button class="btn btn-ghost" on:click={backToPicker}>Back</button>
+					</div>
+				</aside>
 
-        <main class="tools-pane">
-          {#if !selectedToolId}
-            <div style="padding:28px;">
-              <h3 style="margin:0 0 8px 0">Pick an exercise</h3>
-              <div class="small" style="color:#666">Select an option on the left to open the interactive tool here.</div>
-            </div>
+				<main class="tools-pane">
+					{#if !selectedToolId}
+						<div style="padding:28px;">
+							<h3 style="margin:0 0 8px 0">Pick an exercise</h3>
+							<div class="small" style="color:#666">Select an option on the left to open the interactive tool here.</div>
+						</div>
 
-          {:else if selectedToolId === 'breath'}
-            <div style="padding:18px; height:100%; display:flex; flex-direction:column;">
-              <h3 style="margin:0 0 8px 0">Breathing exercise</h3>
-              <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px;">
-                <StressedBreathing config={breathConfig} on:done={onFinished} />
-              </div>
-              <div style="margin-top:8px;">
-                <button class="btn btn-ghost" on:click={() => { selectedToolId = null; }}>Close</button>
-              </div>
-            </div>
-          {:else if selectedToolId === 'pmr'}
-            <div style="padding:18px;">
-              <StressedPMR on:done={onFinished} />
-            </div>
-          {:else if selectedToolId === 'tidy'}
-            <div style="padding:18px;">
-              <StressedTidy mood={mood} on:done={onFinished} on:archived={handleArchived} />
-            </div>
-           {/if}
-         </main>
+					{:else if selectedToolId === 'breath'}
+						<div style="padding:18px; height:100%; display:flex; flex-direction:column;">
+							<h3 style="margin:0 0 8px 0">Breathing exercise</h3>
+							<div style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px;">
+								<StressedBreathing config={breathConfig} on:done={onFinished} />
+							</div>
+							<div style="margin-top:8px;">
+								<button class="btn btn-ghost" on:click={() => { selectedToolId = null; }}>Close</button>
+							</div>
+						</div>
+					{:else if selectedToolId === 'pmr'}
+						<div style="padding:18px;">
+							<StressedPMR on:done={onFinished} />
+						</div>
+					{:else if selectedToolId === 'tidy'}
+						<div style="padding:18px;">
+							<StressedTidy mood={mood} on:done={onFinished} on:archived={handleArchived} />
+						</div>
+					{/if}
+				</main>
 
-         {#if selectedToolId === 'tidy'}
-           <aside class="archived-pane">
-             <div style="padding:12px;">
-               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                 <div style="font-weight:600">Archived</div>
-                 <div style="font-size:.85rem; color:#666">{archivedItems.length} items</div>
-               </div>
+				{#if selectedToolId === 'tidy'}
+					<aside class="archived-pane">
+						<div style="padding:12px;">
+							<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+								<div style="font-weight:600">Archived</div>
+								<div style="font-size:.85rem; color:#666">{archivedItems.length} items</div>
+							</div>
 
-               {#if archivedItems.length === 0}
-                 <div class="small" style="color:#666">No archived items yet. Archive completed tidy items here.</div>
-               {:else}
-                 <div style="display:flex; flex-direction:column; gap:8px;">
-                   {#each archivedItems as a, i}
-                     <div style="padding:8px; border-radius:8px; background:#fff; border:1px solid rgba(15,23,42,0.04); display:flex; justify-content:space-between; align-items:center;">
-                       <div style="flex:1; margin-right:8px;">
-                         <div style="font-weight:600; font-size:0.95rem">{a.text || a.placeholder}</div>
-                         <div class="small" style="color:#777;">{new Date(a.archivedAt || a.ts || Date.now()).toLocaleString()}</div>
-                       </div>
-                       <div style="display:flex; gap:6px;">
-                         <button class="btn btn-ghost" on:click={() => removeArchived(i)}>Remove</button>
-                       </div>
-                     </div>
-                   {/each}
-                 </div>
-                 <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
-                   <button class="btn btn-ghost" on:click={clearArchived}>Clear all</button>
-                 </div>
-               {/if}
-             </div>
-           </aside>
-         {/if}
+							{#if archivedItems.length === 0}
+								<div class="small" style="color:#666">No archived items yet. Archive completed tidy items here.</div>
+							{:else}
+								<div style="display:flex; flex-direction:column; gap:8px;">
+									{#each archivedItems as a, i}
+										<div style="padding:8px; border-radius:8px; background:#fff; border:1px solid rgba(15,23,42,0.04); display:flex; justify-content:space-between; align-items:center;">
+											<div style="flex:1; margin-right:8px;">
+												<div style="font-weight:600; font-size:0.95rem">{a.text || a.placeholder}</div>
+												<div class="small" style="color:#777;">{new Date(a.archivedAt || a.ts || Date.now()).toLocaleString()}</div>
+											</div>
+											<div style="display:flex; gap:6px;">
+												<button class="btn btn-ghost" on:click={() => removeArchived(i)}>Remove</button>
+											</div>
+										</div>
+									{/each}
+								</div>
+								<div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
+									<button class="btn btn-ghost" on:click={clearArchived}>Clear all</button>
+								</div>
+							{/if}
+						</div>
+					</aside>
+				{/if}
 
-      </div>
+			</div>
 
-    {:else if stage === 'breath'}
-      <div class="center">
-        <p class="small" style="margin-bottom:12px">{suggestionText}</p>
-        <div class="actions" style="justify-content:center; margin-top:12px;">
-          <button class="btn btn-ghost" on:click={backToPicker}>Back</button>
-        </div>
-      </div>
+		{:else if stage === 'whale'}
+			<div style="padding:18px;">
+				<Whale on:save={handleWhaleSave} on:back={backFromWhale} />
+			</div>
 
-    {:else if stage === 'done'}
-      <div class="center">
-        <h2>Nice work.</h2>
-        <p class="small">You completed a short exercise. You can do another check-in anytime.</p>
-        <div class="actions" style="justify-content:center; margin-top:12px;">
-          <button class="btn btn-primary" on:click={backToPicker}>Start Another</button>
-        </div>
-      </div>
-    {/if}
-  </div>
+		{:else if stage === 'rabbit'}
+			<div style="padding:18px;">
+				<Rabbit on:save={handleRabbitSave} on:back={backFromRabbit} />
+			</div>
+
+		{:else if stage === 'bird'}
+			<div style="padding:18px;">
+				<Bird on:save={handleBirdSave} on:back={backFromBird} />
+			</div>
+
+		{:else if stage === 'breath'}
+			<div class="center">
+				<p class="small" style="margin-bottom:12px">{suggestionText}</p>
+				<div class="actions" style="justify-content:center; margin-top:12px;">
+					<button class="btn btn-ghost" on:click={backToPicker}>Back</button>
+				</div>
+			</div>
+
+		{:else if stage === 'done'}
+			<div class="center">
+				<h2>Nice work.</h2>
+				<p class="small">You completed a short exercise. You can do another check-in anytime.</p>
+				<div class="actions" style="justify-content:center; margin-top:12px;">
+					<button class="btn btn-primary" on:click={backToPicker}>Start Another</button>
+				</div>
+			</div>
+		{/if}
+	</div>
 </div>
 
 <!-- PMR modal retained for non-tools flows — but main PMR is shown inline in tools pane -->
 
 <!-- Grounding UI -->
 {#if showGrounding}
-  <div class="modal">
-    <div class="modal-card">
-      <h3>{groundingPrompts[groundingIndex].title}</h3>
-      <p>{groundingPrompts[groundingIndex].prompt}</p>
-      <div class="small" style="margin-top:8px">Tap Next when ready</div>
-      <div style="display:flex; gap:8px; margin-top:12px;">
-        <button class="btn btn-primary" on:click={advanceGrounding}>Next</button>
-        <button class="btn btn-ghost" on:click={() => { showGrounding = false; stage = 'done'; }}>Close</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal">
+		<div class="modal-card">
+			<h3>{groundingPrompts[groundingIndex].title}</h3>
+			<p>{groundingPrompts[groundingIndex].prompt}</p>
+			<div class="small" style="margin-top:8px">Tap Next when ready</div>
+			<div style="display:flex; gap:8px; margin-top:12px;">
+				<button class="btn btn-primary" on:click={advanceGrounding}>Next</button>
+				<button class="btn btn-ghost" on:click={() => { showGrounding = false; stage = 'done'; }}>Close</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <!-- Meditation / Playlist UI -->
 {#if showMeditation}
-  <div class="modal">
-    <div class="modal-card">
-      <h3>Guided Meditation</h3>
-      <div style="margin-top:8px">
-        <audio bind:this={audioEl} src={audioSrc} on:timeupdate={onAudioTime} preload="auto"></audio>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <button class="btn btn-ghost" on:click={toggleAudio}>{audioPaused ? 'Play' : 'Pause'}</button>
-          <div style="flex:1; height:8px; background:#eee; border-radius:4px; overflow:hidden;">
-            <div style="height:100%; width:{audioProgress}%; background:linear-gradient(90deg,#6aa6ff,#7ee3ff)"></div>
-          </div>
-          <button class="btn btn-primary" on:click={stopAudioAndDone}>Done</button>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="modal">
+		<div class="modal-card">
+			<h3>Guided Meditation</h3>
+			<div style="margin-top:8px">
+				<audio bind:this={audioEl} src={audioSrc} on:timeupdate={onAudioTime} preload="auto"></audio>
+				<div style="display:flex; align-items:center; gap:8px;">
+					<button class="btn btn-ghost" on:click={toggleAudio}>{audioPaused ? 'Play' : 'Pause'}</button>
+					<div style="flex:1; height:8px; background:#eee; border-radius:4px; overflow:hidden;">
+						<div style="height:100%; width:{audioProgress}%; background:linear-gradient(90deg,#6aa6ff,#7ee3ff)"></div>
+					</div>
+					<button class="btn btn-primary" on:click={stopAudioAndDone}>Done</button>
+				</div>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <!-- Journal Modal -->
 {#if showJournal}
-  <div class="modal">
-    <div class="modal-card">
-      <h3>Brain dump</h3>
-      <div class="small" style="margin-bottom:8px">{Math.ceil(journalSeconds/60)} min remaining</div>
-      <textarea rows="8" bind:value={journalText} style="width:100%"></textarea>
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        <button class="btn btn-primary" on:click={saveJournal}>Save & Done</button>
-        <button class="btn btn-ghost" on:click={closeJournal}>Close</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal">
+		<div class="modal-card">
+			<h3>Brain dump</h3>
+			<div class="small" style="margin-bottom:8px">{Math.ceil(journalSeconds/60)} min remaining</div>
+			<textarea rows="8" bind:value={journalText} style="width:100%"></textarea>
+			<div style="display:flex; gap:8px; margin-top:8px;">
+				<button class="btn btn-primary" on:click={saveJournal}>Save & Done</button>
+				<button class="btn btn-ghost" on:click={closeJournal}>Close</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <!-- Spinner Modal -->
 {#if showSpinner}
-  <div class="modal">
-    <div class="modal-card">
-      <h3>Activity Spinner</h3>
-      <div style="min-height:40px; display:flex; align-items:center; justify-content:center; margin:8px 0; font-weight:600;">
-        {spinnerResult || 'Tap spin to get a suggestion'}
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn btn-primary" on:click={spinOnce}>Spin</button>
-        <button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'done'; }}>Close</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal">
+		<div class="modal-card">
+			<h3>Activity Spinner</h3>
+			<div style="min-height:40px; display:flex; align-items:center; justify-content:center; margin:8px 0; font-weight:600;">
+				{spinnerResult || 'Tap spin to get a suggestion'}
+			</div>
+			<div style="display:flex; gap:8px;">
+				<button class="btn btn-primary" on:click={spinOnce}>Spin</button>
+				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'done'; }}>Close</button>
+			</div>
+		</div>
+	</div>
 {/if}
 
 <style>
-  /* ...existing code... (preserve app styles) ... */
-  .modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.35); }
-  .modal-card { background:white; padding:16px; border-radius:10px; width:90%; max-width:520px; box-shadow:0 6px 20px rgba(0,0,0,0.12); }
-  /* Tools two-column layout */
-  .tools-layout { display:flex; gap:0; align-items:stretch; min-height:60vh; background:transparent; border-radius:8px; overflow:hidden; }
-  .tools-sidebar { width:320px; border-right:1px solid #f2f4f6; background:#fff; display:flex; flex-direction:column; justify-content:space-between; }
-  .tools-pane { flex:1; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:0; }
-  .archived-pane { width:280px; border-left:1px solid #f2f4f6; background:#fbfcff; display:flex; flex-direction:column; justify-content:flex-start; }
-  .tool-card { transition:background .12s, box-shadow .12s; }
+	/* ...existing code... (preserve app styles) ... */
+	.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.35); }
+	.modal-card { background:white; padding:16px; border-radius:10px; width:90%; max-width:520px; box-shadow:0 6px 20px rgba(0,0,0,0.12); }
+	/* Tools two-column layout */
+	.tools-layout { display:flex; gap:0; align-items:stretch; min-height:60vh; background:transparent; border-radius:8px; overflow:hidden; }
+	.tools-sidebar { width:320px; border-right:1px solid #f2f4f6; background:#fff; display:flex; flex-direction:column; justify-content:space-between; }
+	.tools-pane { flex:1; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:0; }
+	.archived-pane { width:280px; border-left:1px solid #f2f4f6; background:#fbfcff; display:flex; flex-direction:column; justify-content:flex-start; }
+	.tool-card { transition:background .12s, box-shadow .12s; }
 
-  /* Header user area (right-aligned) */
-  .header-right {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-  }
-  .welcome {
-    font-size: 0.9rem;
-    color: #333;
-    margin-right: 12px;
-  }
-  .avatar-btn {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .avatar-initials {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: #007bff;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-  }
+	/* Header user area (right-aligned) */
+	.header-right {
+		display: flex;
+		align-items: center;
+		margin-left: auto;
+	}
+	.welcome {
+		font-size: 0.9rem;
+		color: #333;
+		margin-right: 12px;
+	}
+	.avatar-btn {
+		width: 36px;
+		height: 36px;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.avatar {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+	.avatar-initials {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		background: #007bff;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 500;
+	}
 </style>
