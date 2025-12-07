@@ -226,14 +226,32 @@
     try { localStorage.removeItem('tidy_archived'); } catch(e){}
   }
 
+  // basic user state for header
+  let username = 'Huy';
+  let avatarUrl = ''; // set to image path to use a real avatar; empty => show initials
+
 </script>
 
 <div class="app">
   <div class="container" role="main" aria-labelledby="main-title">
-    <div class="header">
-      <h1 id="main-title" class="h-title">MindLink — Guided Calm</h1>
-      <p class="h-sub">Quick check-in & short grounding tools for stressful moments.</p>
-    </div>
+    <!-- header: hide when a mood is selected -->
+    {#if !mood}
+      <div class="header">
+        <div class="header-left">
+          <h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
+        </div>
+        <div class="header-right" role="navigation" aria-label="User">
+          <div class="welcome">Welcome,<span class="user-name">{username}</span></div>
+          <button class="avatar-btn" aria-label="Open profile" title="Profile">
+            {#if avatarUrl}
+              <img src={avatarUrl} alt="avatar" class="avatar" />
+            {:else}
+              <div class="avatar avatar-initials" aria-hidden="true">{username.slice(0,1).toUpperCase()}</div>
+            {/if}
+          </button>
+        </div>
+      </div>
+    {/if}
 
     {#if stage === 'picker'}
       <MoodPicker on:choose={(e) => onChoose(e.detail)} />
@@ -421,4 +439,43 @@
   .tools-pane { flex:1; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:0; }
   .archived-pane { width:280px; border-left:1px solid #f2f4f6; background:#fbfcff; display:flex; flex-direction:column; justify-content:flex-start; }
   .tool-card { transition:background .12s, box-shadow .12s; }
+
+  /* Header user area (right-aligned) */
+  .header-right {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+  .welcome {
+    font-size: 0.9rem;
+    color: #333;
+    margin-right: 12px;
+  }
+  .avatar-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .avatar-initials {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+  }
 </style>
