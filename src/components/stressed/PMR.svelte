@@ -79,7 +79,6 @@
   <div style="display:flex; gap:8px; margin-top:12px;">
     <button class="btn btn-ghost" on:click={toggle}>{running ? 'Pause' : 'Start'}</button>
     <button class="btn btn-primary" on:click={() => { index = pmrSteps.length; dispatch('done'); }}>Done</button>
-    <button class="btn btn-ghost" on:click={closeAll}>Close</button>
   </div>
 </div>
 

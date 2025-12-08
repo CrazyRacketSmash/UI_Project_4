@@ -69,7 +69,6 @@
     <button class="btn btn-primary" on:click={archiveSelected} disabled={!items.some(it => it.checked)}>Archive selected</button>
     <div style="flex:1"></div>
     <button class="btn btn-primary" on:click={finish}>Done</button>
-    <button class="btn btn-ghost" on:click={() => dispatch('done')}>Close</button>
   </div>
 </div>
 

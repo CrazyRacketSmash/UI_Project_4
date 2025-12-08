@@ -6,8 +6,11 @@
   import Whale from './components/Whale.svelte';
   import Rabbit from './components/Rabbit.svelte';
   import Bird from './components/Bird.svelte';
+  import BrainDump from './components/overwhelm/BrainDump.svelte';
+  import Spinner from './components/lonely/Spinner.svelte';
+  import Healing from './components/sad/Healing.svelte';
 
-  let stage = 'picker'; // 'picker' | 'tools' | 'breath' | 'done' | 'pmr' | 'grounding' | 'meditation' | 'journal' | 'spinner'
+  let stage = 'picker';
   let mood = null;
   let breathConfig = null;
 
@@ -19,20 +22,13 @@
       { id: 'tidy', title: 'Tidy 2 items', time: '5 min' }
     ],
     overwhelmed: [
-      { id: 'journal', title: 'Brain dump / free-write', time: '5-15 min' },
-      { id: 'prioritize', title: 'Prioritization (2 min)', time: '3-7 min' },
-      { id: 'microtask_step', title: 'Tiny step micro-task', time: '10 min' },
-      { id: 'pomodoro', title: 'Pomodoro mini-session', time: '10-25+ min' },
-      { id: 'ask_help', title: 'Ask-for-help templates', time: '1-3 min' },
-      { id: 'movement', title: 'Soothing movement (7-min)', time: '7-15 min' }
+      { id: 'braindump', title: 'Brain dump / free-write', time: '5-15 min', singlePane: true }
     ],
     lonely: [
-      { id: 'spinner', title: 'Activity spinner', time: '5-30 min' },
-      { id: 'micro_social', title: 'Micro-social prompt', time: '2-5 min' },
-      { id: 'volunteer', title: 'Volunteer micro-task', time: '10-30 min' },
-      { id: 'creative', title: 'Creative prompt', time: '10-30 min' },
-      { id: 'comfort', title: 'Comfort list', time: '30-60 min' },
-      { id: 'community', title: 'Community nudge', time: 'variable' }
+      { id: 'spinner', title: 'Activity spinner', time: '5-30 min' }
+    ],
+    sad: [
+      { id: 'healing', title: 'Healing activities', time: '10-30 min', singlePane: true }
     ]
   };
 
@@ -44,6 +40,7 @@
     if (mood.id === 'stressed') suggestionText = 'Try a short breathing exercise to calm your nervous system.';
     else if (mood.id === 'overwhelmed') suggestionText = 'Focus on a single small step to create space.';
     else if (mood.id === 'lonely') suggestionText = 'Try a small social or creative nudge.';
+    else if (mood.id === 'sad') suggestionText = 'Engage in a healing activity to nurture your well-being.';
     else suggestionText = 'A short pause and breathing can help reset.';
   }
 
@@ -66,17 +63,33 @@
     }
 
     // prepare tailored items + default breathing configs
-    if (mood.id === 'stressed' || mood.id === 'overwhelmed' || mood.id === 'lonely') {
+    if (mood.id === 'stressed' || mood.id === 'overwhelmed' || mood.id === 'lonely' || mood.id === 'sad') {
       selectedTools = toolsByMood[mood.id] || [];
       // default breath config (can be overridden when starting breath)
       if (mood.id === 'stressed') breathConfig = { cycles: 6, inhale: 4, hold: 2, exhale: 6, autoStart: false };
-      else if (mood.id === 'overwhelmed') breathConfig = { cycles: 4, inhale: 4, hold: 0, exhale: 6, autoStart: false };
-      else if (mood.id === 'lonely') breathConfig = { cycles: 3, inhale: 4, hold: 2, exhale: 8, autoStart: false };
+      else if (mood.id === 'overwhelmed') {
+        selectedToolId = 'braindump';
+      }
+      else if (mood.id === 'lonely') {
+        selectedToolId = 'spinner';
+      }
+      else if (mood.id === 'sad') {
+        selectedToolId = 'healing';
+        // clear previous responses so user starts fresh each check-in
+        try { localStorage.removeItem('sad_healing_responses'); } catch(e){}
+      }
       stage = 'tools';
     } else {
       selectedTools = [];
       breathConfig = null;
-      stage = 'done';
+      // Calm / Okay -> show congrats overlay
+      if (mood.id === 'calm' || mood.id === 'okay') {
+        congratsText = `Congratulations! You're staying mentally healthy. Keep it up!`;
+        showCongrats = true;
+        stage = 'picker';
+      } else {
+        stage = 'done';
+      }
     }
   }
 
@@ -85,6 +98,8 @@
     mood = null;
     breathConfig = null;
     selectedTools = [];
+    showCongrats = false;
+    congratsText = '';
     // reset modal/tool states
     closeAllToolViews();
     selectedToolId = null;
@@ -290,12 +305,15 @@
     birdSaved = false;
     birdNotes = '';
   }
+
+  let showCongrats = false;
+  let congratsText = '';
 </script>
 
 <div class="app">
 	<div class="container" role="main" aria-labelledby="main-title">
 		<!-- header: hide when a mood is selected -->
-		{#if !mood}
+		{#if !mood || mood.id =='calm' || mood.id == 'okay'}
 			<div class="header">
 				<div class="header-left">
 					<h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
@@ -316,91 +334,112 @@
 		{#if stage === 'picker'}
 			<MoodPicker on:choose={(e) => onChoose(e.detail)} />
 		{:else if stage === 'tools'}
-			<!-- three-column layout: left list, center interactive pane, right archived pane -->
-			<div class="tools-layout">
-				<aside class="tools-sidebar">
-					<div style="padding:12px 8px;">
-						<div style="font-weight:600; margin-bottom:6px">{mood.label} — options</div>
-						<div class="small" style="color:#666; margin-bottom:10px">{suggestionText}</div>
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						{#each selectedTools as t}
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<div class="tool-card" class:selected={selectedToolId === t.id} on:click={() => selectTool(t)} style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; margin-bottom:8px;">
-								<div>
-									<div style="font-weight:600">{t.title}</div>
-								</div>
-								<div style="text-align:right">
-									<div class="small" style="color:#777">{t.time}</div>
-								</div>
-							</div>
-						{/each}
-					</div>
-					<div style="padding:12px; border-top:1px solid #f0f0f0;">
-						<button class="btn btn-ghost" on:click={backToPicker}>Back</button>
-					</div>
-				</aside>
-
-				<main class="tools-pane">
-					{#if !selectedToolId}
-						<div style="padding:28px;">
-							<h3 style="margin:0 0 8px 0">Pick an exercise</h3>
-							<div class="small" style="color:#666">Select an option on the left to open the interactive tool here.</div>
-						</div>
-
-					{:else if selectedToolId === 'breath'}
-						<div style="padding:18px; height:100%; display:flex; flex-direction:column;">
-							<h3 style="margin:0 0 8px 0">Breathing exercise</h3>
-							<div style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px;">
-								<StressedBreathing config={breathConfig} on:done={onFinished} />
-							</div>
-							<div style="margin-top:8px;">
-								<button class="btn btn-ghost" on:click={() => { selectedToolId = null; }}>Close</button>
-							</div>
-						</div>
-					{:else if selectedToolId === 'pmr'}
-						<div style="padding:18px;">
-							<StressedPMR on:done={onFinished} />
-						</div>
-					{:else if selectedToolId === 'tidy'}
-						<div style="padding:18px;">
-							<StressedTidy mood={mood} on:done={onFinished} on:archived={handleArchived} />
-						</div>
+			<!-- conditional: single pane for braindump, three-column for others -->
+			{#if selectedToolId === 'braindump' || selectedToolId === 'healing'}
+				<!-- single pane layout for Brain Dump -->
+				<div style="padding:18px; width:100%;">
+					{#if selectedToolId === 'braindump'}
+						<BrainDump mood={mood} on:done={onFinished} />
+					{:else if selectedToolId === 'healing'}
+						<Healing mood={mood} on:back={backToPicker} />
 					{/if}
-				</main>
-
-				{#if selectedToolId === 'tidy'}
-					<aside class="archived-pane">
-						<div style="padding:12px;">
-							<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-								<div style="font-weight:600">Archived</div>
-								<div style="font-size:.85rem; color:#666">{archivedItems.length} items</div>
-							</div>
-
-							{#if archivedItems.length === 0}
-								<div class="small" style="color:#666">No archived items yet. Archive completed tidy items here.</div>
-							{:else}
-								<div style="display:flex; flex-direction:column; gap:8px;">
-									{#each archivedItems as a, i}
-										<div style="padding:8px; border-radius:8px; background:#fff; border:1px solid rgba(15,23,42,0.04); display:flex; justify-content:space-between; align-items:center;">
-											<div style="flex:1; margin-right:8px;">
-												<div style="font-weight:600; font-size:0.95rem">{a.text || a.placeholder}</div>
-												<div class="small" style="color:#777;">{new Date(a.archivedAt || a.ts || Date.now()).toLocaleString()}</div>
-											</div>
-											<div style="display:flex; gap:6px;">
-												<button class="btn btn-ghost" on:click={() => removeArchived(i)}>Remove</button>
-											</div>
-										</div>
-									{/each}
+				</div>
+      {:else if selectedToolId === 'spinner'}
+				<!-- single pane layout for Brain Dump -->
+				<div style="padding:18px; width:100%;">
+					<Spinner mood={mood} on:done={onFinished} />
+				</div>
+			{:else}
+				<!-- three-column layout: left list, center interactive pane, right archived pane -->
+				<div class="tools-layout">
+					<aside class="tools-sidebar">
+						<div style="padding:12px 8px;">
+							<div style="font-weight:600; margin-bottom:6px">{mood.label} — options</div>
+							<div class="small" style="color:#666; margin-bottom:10px">{suggestionText}</div>
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							{#each selectedTools as t}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<div class="tool-card" class:selected={selectedToolId === t.id} on:click={() => selectTool(t)} style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; margin-bottom:8px;">
+									<div>
+										<div style="font-weight:600">{t.title}</div>
+									</div>
+									<div style="text-align:right">
+										<div class="small" style="color:#777">{t.time}</div>
+									</div>
 								</div>
-								<div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
-									<button class="btn btn-ghost" on:click={clearArchived}>Clear all</button>
-								</div>
-							{/if}
+							{/each}
+						</div>
+						<div style="padding:12px; border-top:1px solid #f0f0f0;">
+							<button class="btn btn-ghost" on:click={backToPicker}>Back</button>
 						</div>
 					</aside>
-				{/if}
 
-			</div>
+					<main class="tools-pane">
+						{#if !selectedToolId}
+							<div style="padding:28px;">
+								<h3 style="margin:0 0 8px 0">Pick an exercise</h3>
+								<div class="small" style="color:#666">Select an option on the left to open the interactive tool here.</div>
+							</div>
+
+						{:else if selectedToolId === 'breath'}
+							<div style="padding:18px; height:100%; display:flex; flex-direction:column;">
+								<h3 style="margin:0 0 8px 0">Breathing exercise</h3>
+								<div style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px;">
+									<StressedBreathing config={breathConfig} on:done={onFinished} />
+								</div>
+								<div style="margin-top:8px;">
+									<button class="btn btn-ghost" on:click={() => { selectedToolId = null; }}>Close</button>
+								</div>
+							</div>
+						{:else if selectedToolId === 'pmr'}
+							<div style="padding:18px;">
+								<StressedPMR on:done={onFinished} on:close={() => { selectedToolId = null; }} />
+							</div>
+						{:else if selectedToolId === 'tidy'}
+							<div style="padding:18px;">
+								<StressedTidy mood={mood} on:done={onFinished } on:archived={handleArchived} on:close={() => { selectedToolId = null; }} />
+							</div>
+						{:else if selectedToolId === 'spinner'}
+							<div style="padding:18px;">
+								<Spinner mood={mood} on:done={onFinished} />
+							</div>
+						{/if}
+					</main>
+
+					{#if selectedToolId === 'tidy'}
+						<aside class="archived-pane">
+							<div style="padding:12px;">
+								<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+									<div style="font-weight:600">Archived</div>
+									<div style="font-size:.85rem; color:#666">{archivedItems.length} items</div>
+								</div>
+
+								{#if archivedItems.length === 0}
+									<div class="small" style="color:#666">No archived items yet. Archive completed tidy items here.</div>
+								{:else}
+									<div style="display:flex; flex-direction:column; gap:8px;">
+										{#each archivedItems as a, i}
+											<div style="padding:8px; border-radius:8px; background:#fff; border:1px solid rgba(15,23,42,0.04); display:flex; justify-content:space-between; align-items:center;">
+												<div style="flex:1; margin-right:8px;">
+													<div style="font-weight:600; font-size:0.95rem">{a.text || a.placeholder}</div>
+													<div class="small" style="color:#777;">{new Date(a.archivedAt || a.ts || Date.now()).toLocaleString()}</div>
+												</div>
+												<div style="display:flex; gap:6px;">
+													<button class="btn btn-ghost" on:click={() => removeArchived(i)}>Remove</button>
+												</div>
+											</div>
+										{/each}
+									</div>
+									<div style="margin-top:12px; display:flex; justify-content:flex-end; gap:8px;">
+										<button class="btn btn-ghost" on:click={clearArchived}>Clear all</button>
+									</div>
+								{/if}
+							</div>
+						</aside>
+					{/if}
+
+				</div>
+			{/if}
 
 		{:else if stage === 'whale'}
 			<div style="padding:18px;">
@@ -427,8 +466,8 @@
 
 		{:else if stage === 'done'}
 			<div class="center">
-				<h2>Nice work.</h2>
-				<p class="small">You completed a short exercise. You can do another check-in anytime.</p>
+				<h2>Nice work!</h2>
+				<p class="small">You can always do another check-in anytime.</p>
 				<div class="actions" style="justify-content:center; margin-top:12px;">
 					<button class="btn btn-primary" on:click={backToPicker}>Start Another</button>
 				</div>
@@ -498,10 +537,32 @@
 			</div>
 			<div style="display:flex; gap:8px;">
 				<button class="btn btn-primary" on:click={spinOnce}>Spin</button>
-				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'done'; }}>Close</button>
+				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'back'; }}>Close</button>
 			</div>
 		</div>
 	</div>
+{/if}
+
+{#if showCongrats}
+  <div class="modal">
+    <div class="confetti-wrap" aria-hidden="true">
+      <div class="confetti c1"></div>
+      <div class="confetti c2"></div>
+      <div class="confetti c3"></div>
+      <div class="confetti c4"></div>
+      <div class="confetti c5"></div>
+      <div class="confetti c6"></div>
+      <div class="confetti c7"></div>
+      <div class="confetti c8"></div>
+    </div>
+    <div class="modal-card">
+      <h3>Great job!</h3>
+      <p class="small" style="margin-bottom:12px;">{congratsText}</p>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-primary" on:click={backToPicker}>Close</button>
+      </div>
+    </div>
+  </div>
 {/if}
 
 <style>
@@ -553,4 +614,33 @@
 		justify-content: center;
 		font-weight: 500;
 	}
+
+	.confetti-wrap {
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .confetti {
+    position:absolute;
+    width:10px; height:14px;
+    background: #facc15;
+    opacity:0;
+    animation: drop 2.8s ease-out infinite;
+  }
+  .c1 { left:15%; animation-delay:0s; background:#6aa6ff; }
+  .c2 { left:25%; animation-delay:0.2s; background:#7ee3ff; }
+  .c3 { left:35%; animation-delay:0.4s; background:#f472b6; }
+  .c4 { left:50%; animation-delay:0.1s; background:#facc15; }
+  .c5 { left:62%; animation-delay:0.3s; background:#22c55e; }
+  .c6 { left:74%; animation-delay:0.5s; background:#fb7185; }
+  .c7 { left:82%; animation-delay:0.15s; background:#a855f7; }
+  .c8 { left:92%; animation-delay:0.35s; background:#38bdf8; }
+
+  @keyframes drop {
+    0% { transform: translateY(-40px) rotate(0deg); opacity:0; }
+    10% { opacity:1; }
+    80% { opacity:1; }
+    100% { transform: translateY(140vh) rotate(340deg); opacity:0; }
+  }
 </style>
