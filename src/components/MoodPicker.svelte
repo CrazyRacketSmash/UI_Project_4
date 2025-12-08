@@ -31,10 +31,13 @@
     dispatch('choose', m);
   }
 
-  // select shows check + help row; confirmation happens when user taps the help row
+  // select shows check + help row; Calm/Okay dispatch immediately
   function select(m) {
     selectedId = m.id;
     selectedMood = m;
+    if (m.id === 'calm' || m.id === 'okay') {
+      dispatch('choose', m);
+    }
   }
   function confirmChoice() {
     if (selectedMood) {
@@ -69,7 +72,7 @@
     {/each}
   </div>
   <br>
-  {#if selectedId}
+  {#if selectedId && selectedId !== 'calm' && selectedId !== 'okay'}
     <div
       class="help-row"
       role="button"
@@ -124,13 +127,13 @@
 </section>
 
 <style>
-  .image-actions { display:flex; gap:12px; margin-top:16px; justify-content:center; }
+  .image-actions { display:flex; gap:25px; margin-top:16px; justify-content:center; }
   .image-btn {
-    width:64px; height:64px; border-radius:12px; border:1px solid rgba(15,23,42,0.06);
+    width:75px; height:75px; border-radius:12px; border:1px solid rgba(15,23,42,0.06);
     display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
     transition: transform .14s ease, box-shadow .14s ease;
     padding:8px;
-    background-color: chocolate;
+    background-color: lightcoral;
   }
   .image-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(16,24,40,0.08); }
   .image-btn:active { transform: translateY(-1px) scale(.99); }

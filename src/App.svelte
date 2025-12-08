@@ -75,12 +75,21 @@
       }
       else if (mood.id === 'sad') {
         selectedToolId = 'healing';
+        // clear previous responses so user starts fresh each check-in
+        try { localStorage.removeItem('sad_healing_responses'); } catch(e){}
       }
       stage = 'tools';
     } else {
       selectedTools = [];
       breathConfig = null;
-      stage = 'done';
+      // Calm / Okay -> show congrats overlay
+      if (mood.id === 'calm' || mood.id === 'okay') {
+        congratsText = `Congratulations! You're staying mentally healthy. Keep it up!`;
+        showCongrats = true;
+        stage = 'picker';
+      } else {
+        stage = 'done';
+      }
     }
   }
 
@@ -89,6 +98,8 @@
     mood = null;
     breathConfig = null;
     selectedTools = [];
+    showCongrats = false;
+    congratsText = '';
     // reset modal/tool states
     closeAllToolViews();
     selectedToolId = null;
@@ -294,12 +305,15 @@
     birdSaved = false;
     birdNotes = '';
   }
+
+  let showCongrats = false;
+  let congratsText = '';
 </script>
 
 <div class="app">
 	<div class="container" role="main" aria-labelledby="main-title">
 		<!-- header: hide when a mood is selected -->
-		{#if !mood}
+		{#if !mood || mood.id =='calm' || mood.id == 'okay'}
 			<div class="header">
 				<div class="header-left">
 					<h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
@@ -327,7 +341,7 @@
 					{#if selectedToolId === 'braindump'}
 						<BrainDump mood={mood} on:done={onFinished} />
 					{:else if selectedToolId === 'healing'}
-						<Healing mood={mood} on:done={onFinished} />
+						<Healing mood={mood} on:back={backToPicker} />
 					{/if}
 				</div>
       {:else if selectedToolId === 'spinner'}
@@ -452,8 +466,8 @@
 
 		{:else if stage === 'done'}
 			<div class="center">
-				<h2>Nice work.</h2>
-				<p class="small">You completed a short exercise. You can do another check-in anytime.</p>
+				<h2>Nice work!</h2>
+				<p class="small">You can always do another check-in anytime.</p>
 				<div class="actions" style="justify-content:center; margin-top:12px;">
 					<button class="btn btn-primary" on:click={backToPicker}>Start Another</button>
 				</div>
@@ -523,10 +537,32 @@
 			</div>
 			<div style="display:flex; gap:8px;">
 				<button class="btn btn-primary" on:click={spinOnce}>Spin</button>
-				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'done'; }}>Close</button>
+				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'back'; }}>Close</button>
 			</div>
 		</div>
 	</div>
+{/if}
+
+{#if showCongrats}
+  <div class="modal">
+    <div class="confetti-wrap" aria-hidden="true">
+      <div class="confetti c1"></div>
+      <div class="confetti c2"></div>
+      <div class="confetti c3"></div>
+      <div class="confetti c4"></div>
+      <div class="confetti c5"></div>
+      <div class="confetti c6"></div>
+      <div class="confetti c7"></div>
+      <div class="confetti c8"></div>
+    </div>
+    <div class="modal-card">
+      <h3>Great job!</h3>
+      <p class="small" style="margin-bottom:12px;">{congratsText}</p>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn btn-primary" on:click={backToPicker}>Close</button>
+      </div>
+    </div>
+  </div>
 {/if}
 
 <style>
@@ -578,4 +614,33 @@
 		justify-content: center;
 		font-weight: 500;
 	}
+
+	.confetti-wrap {
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .confetti {
+    position:absolute;
+    width:10px; height:14px;
+    background: #facc15;
+    opacity:0;
+    animation: drop 2.8s ease-out infinite;
+  }
+  .c1 { left:15%; animation-delay:0s; background:#6aa6ff; }
+  .c2 { left:25%; animation-delay:0.2s; background:#7ee3ff; }
+  .c3 { left:35%; animation-delay:0.4s; background:#f472b6; }
+  .c4 { left:50%; animation-delay:0.1s; background:#facc15; }
+  .c5 { left:62%; animation-delay:0.3s; background:#22c55e; }
+  .c6 { left:74%; animation-delay:0.5s; background:#fb7185; }
+  .c7 { left:82%; animation-delay:0.15s; background:#a855f7; }
+  .c8 { left:92%; animation-delay:0.35s; background:#38bdf8; }
+
+  @keyframes drop {
+    0% { transform: translateY(-40px) rotate(0deg); opacity:0; }
+    10% { opacity:1; }
+    80% { opacity:1; }
+    100% { transform: translateY(140vh) rotate(340deg); opacity:0; }
+  }
 </style>
