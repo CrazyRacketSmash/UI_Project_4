@@ -46,7 +46,7 @@
 
 <section aria-label="Mood check-in">
   <h2 class="h-title" style="font-size:1.1rem">How are you feeling right now?</h2>
-  <p class="small">Tap the mood that fits best — we'll suggest a short exercise.</p>
+  <p class="small">Tap the mood that fits best</p>
 
   <div class="mood-grid" role="list">
     {#each moods as mood}
