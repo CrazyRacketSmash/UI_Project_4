@@ -126,7 +126,22 @@
   <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
     <div class="animal-icon" aria-hidden="true" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(90deg,#FFD7D7,#FFB6C1);">
       <!-- rabbit svg -->
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4c-.5-1-2-2-3-1s-1 3 0 4 3 1 4 0 0-2-1-3z" fill="#fff"/><path d="M15 4c.5-1 2-2 3-1s1 3 0 4-3 1-4 0 0-2 1-3z" fill="#fff"/></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <!-- Left ear -->
+        <ellipse cx="9" cy="7" rx="2.5" ry="5" fill="#fff"/>
+        <!-- Right ear -->
+        <ellipse cx="15" cy="7" rx="2.5" ry="5" fill="#fff"/>
+        <!-- Head/body -->
+        <circle cx="12" cy="14" r="6" fill="#fff"/>
+        <!-- Left eye -->
+        <circle cx="10" cy="13" r="0.8" fill="#333"/>
+        <!-- Right eye -->
+        <circle cx="14" cy="13" r="0.8" fill="#333"/>
+        <!-- Nose -->
+        <circle cx="12" cy="15" r="0.6" fill="#ffc0cb"/>
+        <!-- Mouth -->
+        <path d="M12 15.5 Q10.5 16.5 9.5 16 M12 15.5 Q13.5 16.5 14.5 16" stroke="#333" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+      </svg>
     </div>
 
     <div style="flex:1;">

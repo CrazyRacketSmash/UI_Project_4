@@ -72,7 +72,26 @@
 <div class="whale-wrap">
   <div class="whale-header">
     <div class="whale-icon" aria-hidden="true">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M2 12c2-2 6-3 10-3s8 1 10 3c0 0-1 4-6 6-3 1-6 1-10 0C3 18 2 14 2 12z" fill="#fff"/></svg>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="false" role="img" xmlns="http://www.w3.org/2000/svg">
+          <title>Whale</title>
+          <desc>Stylized blue whale with small fin and spout</desc>
+          <defs>
+            <linearGradient id="gWhale" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#7FC0FF"/>
+              <stop offset="100%" stop-color="#2E83FF"/>
+            </linearGradient>
+          </defs>
+          <!-- body -->
+          <path d="M2 12c2-2 6-3 10-3s8 1 10 3c0 0-1 4-6 6-3 1-6 1-10 0C3 18 2 14 2 12z"
+                fill="url(#gWhale)"/>
+          <!-- fin -->
+          <path d="M13 15c-.6.5-1.4.7-2 .6-.6-.1-1.2-.7-1.4-1.3.8-.2 1.9-.2 3 .7z" fill="#2A6FE6" opacity="0.95"/>
+          <!-- eye -->
+          <circle cx="7" cy="11" r="1.1" fill="#fff"/>
+          <circle cx="7.1" cy="11" r="0.4" fill="#2E3A44"/>
+          <!-- spout -->
+          <path d="M9.5 6.2c.2-.8.7-1.5 1.5-1.7.9-.2 1.7.3 2 1.1.3.8-.1 1.7-.9 2-.8.3-1.5-.1-1.9-.8" fill="#BEE6FF" opacity="0.9"/>
+      </svg>
     </div>
     <div class="whale-title">
       <div class="h3">Whale</div>
