@@ -24,7 +24,7 @@
     { id: 3, subject: 'Gratitude', text: '', flipped: false }
   ];
 
-  // human-friendly descriptions for each subject (shown beneath subject)
+  // human-friendly descriptions for each subject
   const subjectDescriptions = {
     'Daily Journal': 'Let\'s capture any kind of activities, moods, and moments you\'ve experienced lately.',
     'Thoughts': 'Put down your overwhelming thoughts, worries or life issues here.',
@@ -135,7 +135,7 @@
     <button class="btn btn-primary" on:click={saveAll}>Save All</button>
   </div>
 
-  <!-- slide-in save notification -->
+  <!-- save notification -->
   <div class="save-notif" role="status" aria-live="polite" class:visible={showNotif}>
     <span class="checkmark" aria-hidden="true">
       <svg viewBox="0 0 52 52" width="20" height="20" focusable="false" aria-hidden="true">
@@ -162,7 +162,6 @@
     margin-bottom:12px;
   }
 
-  /* card base */
   .card { width: 100%; max-width: 340px; perspective: 1000px; }
   .card-inner {
     position: relative;
@@ -214,7 +213,7 @@
 
   .whale-actions { display:flex; gap:8px; align-items:center; margin-top:8px; }
 
-  /* save notification (slides in from right) */
+  /* save notification */
   .save-notif {
     position: absolute;
     right: 18px;
@@ -266,11 +265,9 @@
   .card.color-3 .card-face.card-front { background: linear-gradient(180deg,#e1ebfe,#e9f0ff); color:#072244; }
   .card.color-3 .card-face.card-back  { background: linear-gradient(180deg,#cfe2ff,#9fc7ff); color:#041c3a; }
 
-  /* ensure buttons / text contrast on colored backgrounds */
   .card-subject, .card-desc, .card-top button, .card-top .flip-btn { color: inherit; }
   .card-text { background: rgba(255,255,255,0.9); color: #0f172a; }
 
-  /* responsive */
   @media (max-width: 960px) {
     .cards-grid { flex-direction:column; }
     .card { max-width: 100%; }

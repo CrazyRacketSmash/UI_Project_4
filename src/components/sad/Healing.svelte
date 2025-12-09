@@ -17,12 +17,12 @@
   let suggestions = [];
 
   onMount(() => {
-    // Reset responses and currentIndex when the Sad mood is selected
+    //When the Sad mood is selected, reset these
     responses = {};
     currentIndex = 0;
     fillPercentage = 0;
 
-    // Clear the sad_healing_responses localStorage key only when entering the healing view
+    // Clear this localStorage key only when entering the healing view
     localStorage.removeItem('sad_healing_responses');
   });
 
@@ -77,7 +77,7 @@
       fillPercentage = (currentIndex / questions.length) * 100;
       persist();
     } else {
-      // Last question answered - fill to 100% and generate suggestions
+      // When last question answered - fill to 100% and generate suggestions
       currentIndex++;
       fillPercentage = 100;
       generateSuggestions();
@@ -96,7 +96,7 @@
   }
 
   $: if (responses[questions[currentIndex]?.id]) {
-    // auto-save
+    // auto save
     persist();
   }
 </script>
@@ -106,7 +106,7 @@
   <p class="small">Let's explore what you're feeling. Your answers help you understand and heal.</p>
 
   <div class="beaker-section">
-    <!-- Large beaker visualization -->
+    <!-- Beaker visualization -->
     <div class="beaker-wrapper">
       <div class="beaker">
         <!-- Rising bubbles inside beaker -->
@@ -149,7 +149,7 @@
         </div>
       {:else}
         <div class="question-card" style="text-align:left;">
-          <p class="small" style="text-align:center; margin-bottom:16px;">You've taken an important step in understanding your emotions. Here's what might help:</p>
+          <p class="small" style="text-align:center; margin-bottom:16px;">You've taken an important step in understanding your emotions. Here's something you can try:</p>
 
           <!-- Personalized suggestions -->
           <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
@@ -194,7 +194,7 @@
     align-items: flex-start;
   }
 
-  /* Large beaker */
+  /* Beaker */
   .beaker {
     position: relative;
     width: 120px;

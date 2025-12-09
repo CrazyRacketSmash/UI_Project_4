@@ -2,17 +2,16 @@
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  // Settings (exposed as props so parent can control per-mood)
   export let cycles = 4; // total inhale/exhale cycles
-  export let inhale = 4; // seconds
-  export let hold = 0; // optional hold
-  export let exhale = 6; // seconds
-  export let autoStart = true; // whether to auto-start after mount
+  export let inhale = 4; // 4 seconds
+  export let hold = 0; // hold
+  export let exhale = 6; // 6 seconds
+  export let autoStart = true;
 
   // control circle transition timing based on step duration
   let circleTransition = '900ms cubic-bezier(.22,.9,.34,1)';
 
-  let phase = 'ready'; // 'inhale'|'hold'|'exhale'|'done'
+  let phase = 'ready';
   let text = 'Get ready';
   let progress = 0;
   let circleScale = 1;
@@ -79,14 +78,14 @@
   }
 
   function animateCircle(seconds, targetScale) {
-    // animate scale over the duration using CSS transitions
+    // animate scale over the duration
     circleScale = targetScale;
-    // update transition duration to match the step (minimum 400ms to avoid extremely short transitions)
+    // update transition duration to match the step - minimum 400ms to avoid short transitions
     circleTransition = `${Math.max(400, Math.round(seconds * 1000))}ms cubic-bezier(.22,.9,.34,1)`;
   }
 
   onMount(() => {
-    // auto-start small breathing after mount (only if parent allows)
+    // auto-start small breathing after mount
     const t = setTimeout(() => {
       if (autoStart) start();
     }, 350);
@@ -123,6 +122,5 @@
 </div>
 
 <style>
-  /* component-scoped small tweaks */
   .breath-circle { transition: transform .9s cubic-bezier(.22,.9,.34,1); display:flex; align-items:center; justify-content:center; border-radius:50%; }
 </style>

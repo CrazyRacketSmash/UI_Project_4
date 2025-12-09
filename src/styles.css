@@ -41,7 +41,6 @@ html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6
 .h-title { font-size: 1.35rem; margin:0; }
 .h-sub { color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
 
-/* header right user area */
 .header-right {
   display:flex;
   align-items:center;
@@ -50,7 +49,6 @@ html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6
 .welcome { font-size:0.95rem; color:var(--muted); margin-right:6px; }
 .user-name { font-weight:700; color: #0f172a; margin-left:6px; }
 
-/* avatar styles */
 .avatar-btn { background:transparent; border:none; padding:0; cursor:pointer; display:inline-flex; align-items:center; }
 .avatar {
   width:40px; height:40px; border-radius:50%; object-fit:cover; display:block;
@@ -62,7 +60,6 @@ html,body,#app { height: 100%; margin: 0; background: linear-gradient(180deg,#f6
   box-shadow: 0 6px 16px rgba(16,24,40,0.06);
 }
 
-/* small avatar hover */
 .avatar-btn:hover .avatar, .avatar-btn:hover .avatar-initials { transform: translateY(-2px); transition:transform .12s ease; }
 
 .mood-grid { display:grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 1rem; }

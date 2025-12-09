@@ -7,7 +7,7 @@
   let audioError = false;
 
   onMount(() => {
-    // Auto-play ambient sound
+    // Auto play sound
     if (audioEl) {
       const playPromise = audioEl.play();
       if (playPromise !== undefined) {
