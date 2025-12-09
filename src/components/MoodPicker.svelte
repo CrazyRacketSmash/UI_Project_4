@@ -123,7 +123,7 @@
 
 <section aria-label="Animals">
   <h2 class="h-title" style="font-size:1.1rem">Special Helpers</h2>
-  <p class="small">Try one of the cute animals - HEADS UP: The rabbit seems to hop away when you try to click it!</p>
+  <p class="small">Try one of the cute animals - <b><i><u>HEADS UP:</u></i></b> The rabbit seems to hop away when you try to click it!</p>
 
   <div class="image-actions" role="group" aria-label="Cute helpers">
       <button class="image-btn" on:click={() => handleAnimalClick('whale')} aria-label="Whale">
