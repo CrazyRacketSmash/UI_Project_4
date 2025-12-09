@@ -8,7 +8,7 @@
     { id: 'overwhelmed', label: 'Overwhelmed', emoji: '😵' },
     { id: 'sad', label: 'Sad', emoji: '😔' },
     { id: 'lonely', label: 'Lonely', emoji: '😞' },
-    { id: 'okay', label: 'Okay', emoji: '😐' }
+    { id: 'happy', label: 'Happy', emoji: '😊' }
   ];
 
   // local selection state so UI can show check & help-row
@@ -16,12 +16,10 @@
   let selectedMood = null;
 
   const helpPhrases = {
-    calm: 'stay calm',
     stressed: 'de-stress',
     overwhelmed: 'create space',
     sad: 'feel better',
-    lonely: 'connect',
-    okay: 'refocus'
+    lonely: 'connect'
   };
 
   $: helpText = selectedId ? (helpPhrases[selectedId] || 'reset') : '';
@@ -35,7 +33,7 @@
   function select(m) {
     selectedId = m.id;
     selectedMood = m;
-    if (m.id === 'calm' || m.id === 'okay') {
+    if (m.id === 'calm' || m.id === 'happy') {
       dispatch('choose', m);
     }
   }
@@ -72,7 +70,7 @@
     {/each}
   </div>
   <br>
-  {#if selectedId && selectedId !== 'calm' && selectedId !== 'okay'}
+  {#if selectedId && selectedId !== 'calm' && selectedId !== 'happy'}
     <div
       class="help-row"
       role="button"

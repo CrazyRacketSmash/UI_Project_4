@@ -64,22 +64,27 @@
                 <defs><linearGradient id="grad-chat" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6aa6ff;stop-opacity:1" /><stop offset="100%" style="stop-color:#7ee3ff;stop-opacity:1" /></linearGradient></defs>
               {:else if spinResult.icon === 'create'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-create)"/>
-                <path d="M24 16v32l16-8" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                <circle cx="28" cy="24" r="3" fill="white"/>
+                <path d="M26 28c0-3.3 2.7-6 6-6s6 2.7 6 6c0 2-1 3.8-2.5 4.8V36h-7v-3.2C27 31.8 26 30 26 28z" fill="white"/>
+                <rect x="29" y="36" width="6" height="3" rx="1" fill="white"/>
+                <rect x="30" y="39" width="4" height="2" rx="1" fill="white"/>
+                <line x1="32" y1="17" x2="32" y2="20" stroke="white" stroke-width="2" stroke-linecap="round" class="s-NWm_6TrhaFd3"></line>
+                <line x1="22" y1="22" x2="24.5" y2="24.5" stroke="white" stroke-width="2" stroke-linecap="round" class="s-NWm_6TrhaFd3"></line>
+                <line x1="42" y1="22" x2="39.5" y2="24.5" stroke="white" stroke-width="2" stroke-linecap="round" class="s-NWm_6TrhaFd3"></line>
                 <defs><linearGradient id="grad-create" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" /><stop offset="100%" style="stop-color:#f472b6;stop-opacity:1" /></linearGradient></defs>
               {:else if spinResult.icon === 'walk'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-walk)"/>
-                <path d="M32 18c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4z" fill="white"/>
-                <path d="M32 24v12M28 30l-6 6M36 30l6 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M32 12 L38 22 L36 22 L42 32 L39 32 L44 42 L20 42 L25 32 L22 32 L28 22 L26 22 Z" fill="white"/>
+                <rect x="30" y="42" width="4" height="8" fill="white"/>
                 <defs><linearGradient id="grad-walk" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#10b981;stop-opacity:1" /><stop offset="100%" style="stop-color:#34d399;stop-opacity:1" /></linearGradient></defs>
               {:else if spinResult.icon === 'call'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-call)"/>
-                <path d="M22 28c2-4 6-8 10-10l4 4c1 1 3 1 4 0 2-2 4-4 5-6 1-2-1-4-3-5l-3-1c-1 0-2 1-3 2-4 4-8 8-12 12-1 1 0 3 1 4l4 4c1 1 1 3 0 4-2 4-6 8-10 10" fill="white"/>
+                <path d="M24 18h16v4h-16zM24 22h4v16h-4zM36 22h4v16h-4zM24 38h16v4h-16z" fill="white"/>
+                <circle cx="32" cy="30" r="6" fill="none" stroke="white" stroke-width="2"/>
                 <defs><linearGradient id="grad-call" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" /><stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" /></linearGradient></defs>
               {:else if spinResult.icon === 'dance'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-dance)"/>
-                <path d="M32 16c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" fill="white"/>
-                <path d="M24 26l6-6 6 6M24 38c2-4 4-8 8-10s8 0 8 4M20 42c4-2 8-4 12-2s4 8 0 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M38 16v20c0 3-2 5-4 5s-4-2-4-5 2-5 4-5c1 0 2 0.5 2.5 1V16h1.5z" fill="white"/>
+                <circle cx="34" cy="18" r="2" fill="white"/>
                 <defs><linearGradient id="grad-dance" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" /><stop offset="100%" style="stop-color:#d946ef;stop-opacity:1" /></linearGradient></defs>
               {:else if spinResult.icon === 'watch'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-watch)"/>
@@ -94,7 +99,7 @@
               {:else if spinResult.icon === 'help'}
                 <circle cx="32" cy="32" r="30" fill="url(#grad-help)"/>
                 <path d="M20 32c0-6.6 5.4-12 12-12s12 5.4 12 12-5.4 12-12 12-12-5.4-12-12z" fill="none" stroke="white" stroke-width="2.5"/>
-                <path d="M26 28c0-2 2-3 3-3 2 0 3 1 3 3 0 2-2 4-1 6M32 46v2" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <path d="M28 28c0-2 2-3 3-3 2 0 3 1 3 3 0 3-2 4-1 6M32 39v2" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
                 <defs><linearGradient id="grad-help" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" /><stop offset="100%" style="stop-color:#f87171;stop-opacity:1" /></linearGradient></defs>
               {/if}
             </svg>
