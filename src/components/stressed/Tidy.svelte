@@ -9,7 +9,6 @@
     { id: 2, text: '', placeholder: 'Put away / finish item 2', checked: false }
   ];
 
-  // helper to generate ids
   let nextId = 3;
 
   function addItem() {
@@ -20,7 +19,7 @@
     items = items.slice(0, i).concat(items.slice(i + 1));
   }
 
-  // Archive selected items (move them out of current list and emit them)
+  // Archive selected items
   function archiveSelected() {
     const selected = items.filter(it => it.checked);
     if (!selected.length) return;
@@ -36,7 +35,7 @@
     dispatch('archived', selected);
   }
 
-  // Finish the tidy exercise (keeps current items, just signals done)
+  // Finish the tidy exercise
   function finish() {
     dispatch('done');
   }
@@ -74,7 +73,6 @@
 
 <style>
   .small { font-size:0.9rem; color:#6b7280; }
-  /* hide native checkbox but keep it focusable/accessible */
   .native-checkbox {
     position: absolute;
     opacity: 0;
@@ -83,7 +81,6 @@
     pointer-events: all;
   }
 
-  /* custom checkbox visual */
   .check {
     width:22px;
     height:22px;
@@ -97,7 +94,6 @@
     position: relative;
   }
 
-  /* checkmark (hidden by default) */
   .check::after {
     content: "";
     position: absolute;
@@ -112,7 +108,6 @@
     transition: opacity .18s ease, transform .18s ease;
   }
 
-  /* when checked: color, lift, and show checkmark */
   label.checked .check {
     background: linear-gradient(90deg,#6aa6ff,#7ee3ff);
     border-color: transparent;
@@ -124,7 +119,6 @@
     transform: rotate(45deg) scale(1);
   }
 
-  /* subtle focus style when native checkbox focused */
   .native-checkbox:focus + .check {
     box-shadow: 0 6px 18px rgba(79,156,232,0.12);
     outline: none;
@@ -132,6 +126,5 @@
 
   input[type="text"]::placeholder { color: #9aa6b2; }
 
-  /* ensure layout uses provided CSS vars */
   :global(:root) { --card: #fff; }
 </style>

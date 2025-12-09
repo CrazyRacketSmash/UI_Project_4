@@ -62,10 +62,10 @@
       return;
     }
 
-    // prepare tailored items + default breathing configs
+    // prepare tailored items
     if (mood.id === 'stressed' || mood.id === 'overwhelmed' || mood.id === 'lonely' || mood.id === 'sad') {
       selectedTools = toolsByMood[mood.id] || [];
-      // default breath config (can be overridden when starting breath)
+      // default breath config
       if (mood.id === 'stressed') breathConfig = { cycles: 6, inhale: 4, hold: 2, exhale: 6, autoStart: false };
       else if (mood.id === 'overwhelmed') {
         selectedToolId = 'braindump';
@@ -82,7 +82,7 @@
     } else {
       selectedTools = [];
       breathConfig = null;
-      // Calm / Okay -> show congrats overlay
+      // Calm / Happy -> show congrats overlay
       if (mood.id === 'calm' || mood.id === 'happy') {
         congratsText = `Congratulations! You're staying mentally healthy. Keep it up!`;
         showCongrats = true;
@@ -100,7 +100,7 @@
     selectedTools = [];
     showCongrats = false;
     congratsText = '';
-    // reset modal/tool states
+    // reset tool states
     closeAllToolViews();
     selectedToolId = null;
   }
@@ -117,17 +117,14 @@
     showGrounding = false;
     showMeditation = false;
     showJournal = false;
-    showSpinner = false;
     audioPaused = true;
   }
 
-  // select tool for right-hand pane (keeps user in tools view)
+  // select tool for right-hand pane
   function selectTool(tool) {
-    // apply any immediate config changes needed before rendering the pane
     if (tool.id === 'breath') {
       breathConfig = { ...breathConfig, autoStart: true };
     } else if (tool.id === 'pmr') {
-      // init pmr
       pmrIndex = 0;
       pmrRemaining = pmrSteps[pmrIndex].secs;
     } else if (tool.id === 'meditation') {
@@ -138,7 +135,7 @@
     selectedToolId = tool.id;
   }
 
-  // Progressive Muscle Relaxation (PMR)
+  // Progressive Muscle Relaxation
   let showPMR = false;
   let pmrSteps = [
     { label: 'Clench your fists', secs: 8 },
@@ -152,47 +149,6 @@
   let pmrIndex = 0;
   let pmrRemaining = 0;
   let pmrRunning = false;
-
-  // --- Grounding 5-4-3-2-1 ---
-  let showGrounding = false;
-  let groundingPrompts = [
-    { title: 'See 5', prompt: 'Name 5 things you can see.' },
-    { title: 'Hear 4', prompt: 'Name 4 things you can hear.' },
-    { title: 'Touch 3', prompt: 'Name 3 things you can feel.' },
-    { title: 'Smell 2', prompt: 'Name 2 things you can smell.' },
-    { title: 'Taste 1', prompt: 'Name 1 thing you can taste.' }
-  ];
-  let groundingIndex = 0;
-
-  function advanceGrounding() {
-    groundingIndex++;
-    if (groundingIndex >= groundingPrompts.length) {
-      showGrounding = false;
-      stage = 'done';
-    }
-  }
-
-  // --- Meditation audio player (minimal) ---
-  let showMeditation = false;
-  let audioSrc = ''; // replace with actual asset path when available
-  let audioEl;
-  let audioPaused = true;
-  let audioProgress = 0;
-
-  function toggleAudio() {
-    if (!audioEl) return;
-    if (audioEl.paused) { audioEl.play(); audioPaused = false; }
-    else { audioEl.pause(); audioPaused = true; }
-  }
-  function onAudioTime() {
-    if (!audioEl || !audioEl.duration) return;
-    audioProgress = (audioEl.currentTime / audioEl.duration) * 100;
-  }
-  function stopAudioAndDone() {
-    if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; }
-    showMeditation = false;
-    stage = 'done';
-  }
 
   // --- Journaling modal with timer ---
   let showJournal = false;
@@ -213,24 +169,7 @@
     if (journalTimerId) clearInterval(journalTimerId);
   }
 
-  // --- Activity spinner for Lonely ---
-  let showSpinner = false;
-  const spinnerActivities = [
-    'Take a short photo walk (15 min)',
-    'Write a 6-line poem',
-    'Send a micro-social message to one person',
-    'Do a small creative prompt (draw 1 minute)',
-    'Make a comfort snack',
-    'Browse an online forum and comment once'
-  ];
-  let spinnerResult = null;
-
-  function spinOnce() {
-    const idx = Math.floor(Math.random() * spinnerActivities.length);
-    spinnerResult = spinnerActivities[idx];
-  }
-
-  // archived items shown in right column (merge from multiple tidy runs)
+  // archived items shown in right column of Tidy tool
   let archivedItems = [];
 
   // load archived on mount
@@ -262,9 +201,9 @@
 
   // basic user state for header
   let username = 'Huy';
-  let avatarUrl = ''; // set to image path to use a real avatar; empty => show initials
+  let avatarUrl = '';
 
-  // whale state (keeps a copy of saved notes in app if needed)
+  // whale state
   let whaleNotes = '';
   let whaleSaved = false;
   function handleWhaleSave(e) {
@@ -476,42 +415,6 @@
 	</div>
 </div>
 
-<!-- PMR modal retained for non-tools flows — but main PMR is shown inline in tools pane -->
-
-<!-- Grounding UI -->
-{#if showGrounding}
-	<div class="modal">
-		<div class="modal-card">
-			<h3>{groundingPrompts[groundingIndex].title}</h3>
-			<p>{groundingPrompts[groundingIndex].prompt}</p>
-			<div class="small" style="margin-top:8px">Tap Next when ready</div>
-			<div style="display:flex; gap:8px; margin-top:12px;">
-				<button class="btn btn-primary" on:click={advanceGrounding}>Next</button>
-				<button class="btn btn-ghost" on:click={() => { showGrounding = false; stage = 'done'; }}>Close</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Meditation / Playlist UI -->
-{#if showMeditation}
-	<div class="modal">
-		<div class="modal-card">
-			<h3>Guided Meditation</h3>
-			<div style="margin-top:8px">
-				<audio bind:this={audioEl} src={audioSrc} on:timeupdate={onAudioTime} preload="auto"></audio>
-				<div style="display:flex; align-items:center; gap:8px;">
-					<button class="btn btn-ghost" on:click={toggleAudio}>{audioPaused ? 'Play' : 'Pause'}</button>
-					<div style="flex:1; height:8px; background:#eee; border-radius:4px; overflow:hidden;">
-						<div style="height:100%; width:{audioProgress}%; background:linear-gradient(90deg,#6aa6ff,#7ee3ff)"></div>
-					</div>
-					<button class="btn btn-primary" on:click={stopAudioAndDone}>Done</button>
-				</div>
-			</div>
-		</div>
-	</div>
-{/if}
-
 <!-- Journal Modal -->
 {#if showJournal}
 	<div class="modal">
@@ -522,22 +425,6 @@
 			<div style="display:flex; gap:8px; margin-top:8px;">
 				<button class="btn btn-primary" on:click={saveJournal}>Save & Done</button>
 				<button class="btn btn-ghost" on:click={closeJournal}>Close</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Spinner Modal -->
-{#if showSpinner}
-	<div class="modal">
-		<div class="modal-card">
-			<h3>Activity Spinner</h3>
-			<div style="min-height:40px; display:flex; align-items:center; justify-content:center; margin:8px 0; font-weight:600;">
-				{spinnerResult || 'Tap spin to get a suggestion'}
-			</div>
-			<div style="display:flex; gap:8px;">
-				<button class="btn btn-primary" on:click={spinOnce}>Spin</button>
-				<button class="btn btn-ghost" on:click={() => { showSpinner = false; stage = 'back'; }}>Close</button>
 			</div>
 		</div>
 	</div>
@@ -566,7 +453,6 @@
 {/if}
 
 <style>
-	/* ...existing code... (preserve app styles) ... */
 	.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.35); }
 	.modal-card { background:white; padding:16px; border-radius:10px; width:90%; max-width:520px; box-shadow:0 6px 20px rgba(0,0,0,0.12); }
 	/* Tools two-column layout */
@@ -576,7 +462,7 @@
 	.archived-pane { width:280px; border-left:1px solid #f2f4f6; background:#fbfcff; display:flex; flex-direction:column; justify-content:flex-start; }
 	.tool-card { transition:background .12s, box-shadow .12s; }
 
-	/* Header user area (right-aligned) */
+	/* Header user area */
 	.header-right {
 		display: flex;
 		align-items: center;

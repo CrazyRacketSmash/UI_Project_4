@@ -11,7 +11,7 @@
     { id: 'happy', label: 'Happy', emoji: '😊' }
   ];
 
-  // local selection state so UI can show check & help-row
+  // local selection state
   let selectedId = null;
   let selectedMood = null;
 
@@ -26,7 +26,7 @@
 
   // Rabbit hopping state
   let rabbitHoverCount = 0;
-  let rabbitPosition = { x: 0, y: 0 }; // absolute position
+  let rabbitPosition = { x: 0, y: 0 };
   let isHopping = false;
 
   function handleRabbitHover() {
@@ -57,12 +57,12 @@
     choose({ id, label: id.charAt(0).toUpperCase() + id.slice(1), emoji: id === 'whale' ? '🐋' : id === 'rabbit' ? '🐰' : '🐦' });
   }
 
-  // immediate choose for helper animals (whale/rabbit/bird)
+  // immediate choose for helper animals
   function choose(m) {
     dispatch('choose', m);
   }
 
-  // select shows check + help row; Calm/Okay dispatch immediately
+  // select shows check + help row; Calm/Happy dispatch immediately
   function select(m) {
     selectedId = m.id;
     selectedMood = m;
@@ -73,7 +73,7 @@
   function confirmChoice() {
     if (selectedMood) {
       dispatch('choose', selectedMood);
-      // keep selection (Parent will typically change stage)
+      // keep selection
     }
   }
 </script>
@@ -284,7 +284,7 @@
     overflow: hidden;
   }
 
-  /* animated sweep overlay (hidden by default) */
+  /* animated sweep overlay */
   .help-row::before {
     content: "";
     position: absolute;

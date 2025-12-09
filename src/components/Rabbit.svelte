@@ -2,8 +2,6 @@
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  // cards: two goal cards, one text card, one todo card
-  // add completed:false on all so saved state is consistent
   let cards = [
     { id: 'nature', label: 'Nature', icon: '🌿', type: 'nature', nature: '', unit: 'minutes', completed: false },
     { id: 'exercise', label: 'Exercise', icon: '🏃', type: 'goal', goal: '', unit: 'minutes', completed: false },
@@ -11,9 +9,9 @@
     { id: 'barehand', label: 'Bare Hand', icon: '👐', type: 'todo', todos: [], completed: false }
   ];
 
-  let openCard = null; // card id opened in overlay
+  let openCard = null;
   let saved = false;
-  // currently selected card for overlay
+  // currently selected card
   $: currentCard = openCard ? cards.find(c => c.id === openCard) : null;
 
   onMount(() => {
@@ -24,7 +22,7 @@
         cards = cards.map(c => {
           const s = stored.find(x => x.id === c.id);
           if (s) {
-            // Preserve type, icon, label from default; merge user data
+            // Preserve type, icon, label from default but merge user data
             return { 
               ...c, 
               ...s, 
@@ -36,9 +34,8 @@
           return c;
         });
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
 
-    // persist on page unload to guard against accidental refresh/close
     function _beforeUnload() { persist(); }
     // attach listener on mount and remove on destroy
     window.addEventListener('beforeunload', _beforeUnload);
@@ -71,7 +68,6 @@
     } catch (e) {}
   }
 
-  // helpers for todo list (barehand)
   function addTodo(card) {
     card.todos = card.todos || [];
     card.todos.push({ id: Date.now(), text: '', done: false });
@@ -84,7 +80,6 @@
     persist();
   }
 
-  // quick Save All
   function saveAll() {
     persist();
     saved = true;
@@ -108,7 +103,7 @@
     }
   }
 
-  // Auto-completion for text card (kindness)
+  // Auto-completion for kindness card
   $: {
     const textCard = cards.find(c => c.type === 'text');
     if (textCard) {
@@ -388,10 +383,8 @@
     opacity: 0.72;
   }
 
-  /* ensure remove button is compact */
   .todo-item .btn-ghost { padding:6px 8px; }
 
-  /* responsive */
   @media (max-width:720px) {
     .card-grid { grid-template-columns: 1fr; }
   }

@@ -152,7 +152,7 @@
     filter: drop-shadow(0 8px 16px rgba(126,227,255,0.3));
   }
 
-  /* Bubble gradients - more visible and shimmery */
+  /* Bubble gradients more visible and shimmery */
   .bubble-1 {
     width:28px;
     height:28px;

@@ -3,7 +3,7 @@
   const dispatch = createEventDispatcher();
 
   let text = '';
-  let seconds = 300; // default 5 min timer
+  let seconds = 300; // 5 min timer
   let running = false;
   let timerId = null;
 
@@ -44,7 +44,7 @@
        localStorage.setItem(k, text || '');
        localStorage.removeItem('brain_dump_draft');
      } catch(e){ console.error('Save failed:', e); }
-     // dispatch done event to parent (App.svelte)
+     // dispatch done event to App
      dispatch('done');
   }
 </script>
