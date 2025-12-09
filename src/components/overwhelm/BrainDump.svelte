@@ -58,9 +58,9 @@
   <div style="display:flex; gap:8px; align-items:center; margin-top:10px;">
     <div style="font-weight:700">{Math.floor(seconds/60)}:{String(seconds%60).padStart(2,'0')}</div>
     <button class="btn" on:click={startStop}>{running ? 'Pause' : 'Start'}</button>
-    <button class="btn btn-primary" on:click={saveAndDone}>Save & Done</button>
+    <button class="btn btn-primary" on:click={saveAndDone}>Done</button>
     <div style="flex:1"></div>
-    <button class="btn btn-ghost" on:click={() => dispatch('done')}>Close</button>
+    <button class="btn btn-ghost" on:click={() => dispatch('back')}>Back</button>
   </div>
 </div>
 

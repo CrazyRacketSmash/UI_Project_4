@@ -144,6 +144,7 @@
             <button class="btn btn-primary" on:click={answerQuestion} disabled={!responses[questions[currentIndex].id]?.trim()}>
               {currentIndex === questions.length - 1 ? 'Finish' : 'Next'}
             </button>
+            <button class="btn btn-ghost" on:click={() => dispatch('back')}>Back</button>
           </div>
         </div>
       {:else}
@@ -163,7 +164,7 @@
             {/each}
           </div>
 
-          <p class="small" style="color:#999; text-align:center; margin-bottom:12px;">Remember, healing takes time. Be patient with yourself.</p>
+          <h4 class="small" style="color:#999; text-align:center; margin-bottom:12px;">Remember, healing takes time...Be patient with yourself!</h4>
           <button class="btn btn-primary" on:click={finish} style="width:100%;">Close</button>
         </div>
       {/if}
@@ -175,7 +176,7 @@
   .healing-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
   }
 
   .small { font-size:0.9rem; color:#6b7280; }

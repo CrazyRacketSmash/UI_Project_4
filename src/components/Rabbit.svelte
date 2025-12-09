@@ -5,7 +5,7 @@
   // cards: two goal cards, one text card, one todo card
   // add completed:false on all so saved state is consistent
   let cards = [
-    { id: 'nature', label: 'Nature', icon: '🌿', type: 'goal', goal: '', unit: 'minutes', completed: false },
+    { id: 'nature', label: 'Nature', icon: '🌿', type: 'nature', nature: '', unit: 'minutes', completed: false },
     { id: 'exercise', label: 'Exercise', icon: '🏃', type: 'goal', goal: '', unit: 'minutes', completed: false },
     { id: 'kindness', label: 'Kindness', icon: '🤝', type: 'text', text: '', completed: false },
     { id: 'barehand', label: 'Bare Hand', icon: '👐', type: 'todo', todos: [], completed: false }
@@ -20,10 +20,20 @@
     try {
       const stored = JSON.parse(localStorage.getItem('rabbit_cards') || 'null');
       if (stored && Array.isArray(stored) && stored.length) {
-        // merge stored values onto default cards (preserve structure)
+        // merge stored values but preserve type from default cards
         cards = cards.map(c => {
           const s = stored.find(x => x.id === c.id);
-          return s ? { ...c, ...s } : c;
+          if (s) {
+            // Preserve type, icon, label from default; merge user data
+            return { 
+              ...c, 
+              ...s, 
+              type: c.type,
+              icon: c.icon,
+              label: c.label
+            };
+          }
+          return c;
         });
       }
     } catch (e) { /* ignore */ }
@@ -73,11 +83,6 @@
     cards = cards;
     persist();
   }
-  function toggleTodo(card, idx) {
-    card.todos[idx].done = !card.todos[idx].done;
-    cards = cards;
-    persist();
-  }
 
   // quick Save All
   function saveAll() {
@@ -90,27 +95,28 @@
     dispatch('back');
   }
 
+  // Auto-completion for todo card
   $: {
     const todoCard = cards.find(c => c.type === 'todo');
-    if (todoCard) {
-      const allDone = Array.isArray(todoCard.todos) && todoCard.todos.length > 0 && todoCard.todos.every(t => t.done);
-      if (todoCard.completed !== !!allDone) {
-        todoCard.completed = !!allDone;
-        // reassign to trigger reactivity and persist change
+    if (todoCard && Array.isArray(todoCard.todos)) {
+      const allDone = todoCard.todos.length > 0 && todoCard.todos.every(t => t.done);
+      if (todoCard.completed !== allDone) {
+        todoCard.completed = allDone;
         cards = cards;
-        try { localStorage.setItem('rabbit_cards', JSON.stringify(cards)); } catch (e) {}
+        persist();
       }
     }
   }
 
+  // Auto-completion for text card (kindness)
   $: {
     const textCard = cards.find(c => c.type === 'text');
     if (textCard) {
       const hasText = (textCard.text || '').trim().length > 0;
-      if (textCard.completed !== !!hasText) {
-        textCard.completed = !!hasText;
+      if (textCard.completed !== hasText) {
+        textCard.completed = hasText;
         cards = cards;
-        try { localStorage.setItem('rabbit_cards', JSON.stringify(cards)); } catch (e) {}
+        persist();
       }
     }
   }
@@ -120,7 +126,22 @@
   <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
     <div class="animal-icon" aria-hidden="true" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(90deg,#FFD7D7,#FFB6C1);">
       <!-- rabbit svg -->
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4c-.5-1-2-2-3-1s-1 3 0 4 3 1 4 0 0-2-1-3z" fill="#fff"/><path d="M15 4c.5-1 2-2 3-1s1 3 0 4-3 1-4 0 0-2 1-3z" fill="#fff"/></svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <!-- Left ear -->
+        <ellipse cx="9" cy="7" rx="2.5" ry="5" fill="#fff"/>
+        <!-- Right ear -->
+        <ellipse cx="15" cy="7" rx="2.5" ry="5" fill="#fff"/>
+        <!-- Head/body -->
+        <circle cx="12" cy="14" r="6" fill="#fff"/>
+        <!-- Left eye -->
+        <circle cx="10" cy="13" r="0.8" fill="#333"/>
+        <!-- Right eye -->
+        <circle cx="14" cy="13" r="0.8" fill="#333"/>
+        <!-- Nose -->
+        <circle cx="12" cy="15" r="0.6" fill="#ffc0cb"/>
+        <!-- Mouth -->
+        <path d="M12 15.5 Q10.5 16.5 9.5 16 M12 15.5 Q13.5 16.5 14.5 16" stroke="#333" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+      </svg>
     </div>
 
     <div style="flex:1;">
@@ -142,12 +163,18 @@
         </div>
         <div class="cat-icon">{card.icon}</div>
         <div class="cat-label">{card.label}</div>
+        {#if card.type === 'nature' && card.nature}
+          <div class="cat-sub">Nature goal: {card.nature} {card.unit}</div>
+        {/if}
+
         {#if card.type === 'goal' && card.goal}
           <div class="cat-sub">Goal: {card.goal} {card.unit}</div>
         {/if}
+
         {#if card.type === 'text' && card.text}
           <div class="cat-sub">{card.text.length > 40 ? card.text.slice(0,40) + '…' : card.text}</div>
         {/if}
+        
         {#if card.type === 'todo' && card.todos && card.todos.length}
           <div class="cat-sub">{card.todos.filter(t=>t.done).length}/{card.todos.length} done</div>
         {/if}
@@ -175,14 +202,29 @@
             <div>
               <div style="font-weight:700; font-size:1.05rem;">{currentCard.label}</div>
               <div class="small" style="color:#666">
-                {#if currentCard.type === 'goal'}Set a measurable target for this category.{/if}
+                {#if currentCard.type === 'nature'}Set a time for immersion in nature.{/if}
+                {#if currentCard.type === 'goal'}Lock in a specific time target for exercising.{/if}
                 {#if currentCard.type === 'text'}Write a short kindness note.{/if}
-                {#if currentCard.type === 'todo'}Manage a quick checklist of tasks.{/if}
+                {#if currentCard.type === 'todo'}Create fun and small things you can do with bare hands.{/if}
               </div>
             </div>
           </div>
 
           <div style="margin-top:12px;">
+            {#if currentCard.type === 'nature'}
+              <!-- svelte-ignore a11y-label-has-associated-control -->
+              <label class="small">Target</label>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <input type="number" min="0" bind:value={currentCard.nature} on:input={() => persist()} placeholder="e.g. 30" style="padding:8px; width:120px;"/>
+                <select bind:value={currentCard.unit} on:change={() => persist()} style="padding:8px;">
+                  <option value="minutes">minutes</option>
+                </select>
+              </div>
+              <div style="margin-top:10px; display:flex; align-items:center; gap:8px;">
+                <input id="nature-complete" type="checkbox" bind:checked={currentCard.completed} on:change={() => { cards = cards; persist(); }} />
+                <label for="nature-complete" class="small">Mark complete</label>
+              </div>
+            {/if}
             {#if currentCard.type === 'goal'}
               <!-- svelte-ignore a11y-label-has-associated-control -->
               <label class="small">Target</label>
@@ -195,8 +237,8 @@
                 </select>
               </div>
               <div style="margin-top:10px; display:flex; align-items:center; gap:8px;">
-                <input id="goal-complete-{currentCard.id}" type="checkbox" bind:checked={currentCard.completed} on:change={() => persist()} />
-                <label for="goal-complete-{currentCard.id}" class="small">Mark complete</label>
+                <input id="exercise-complete" type="checkbox" bind:checked={currentCard.completed} on:change={() => { cards = cards; persist(); }} />
+                <label for="exercise-complete" class="small">Mark complete</label>
               </div>
             {/if}
 

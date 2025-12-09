@@ -83,7 +83,7 @@
       selectedTools = [];
       breathConfig = null;
       // Calm / Okay -> show congrats overlay
-      if (mood.id === 'calm' || mood.id === 'okay') {
+      if (mood.id === 'calm' || mood.id === 'happy') {
         congratsText = `Congratulations! You're staying mentally healthy. Keep it up!`;
         showCongrats = true;
         stage = 'picker';
@@ -313,7 +313,7 @@
 <div class="app">
 	<div class="container" role="main" aria-labelledby="main-title">
 		<!-- header: hide when a mood is selected -->
-		{#if !mood || mood.id =='calm' || mood.id == 'okay'}
+		{#if !mood || mood.id =='calm' || mood.id == 'happy'}
 			<div class="header">
 				<div class="header-left">
 					<h1 id="main-title" class="h-title">Mind Link - designed for mental well-being</h1>
@@ -339,7 +339,7 @@
 				<!-- single pane layout for Brain Dump -->
 				<div style="padding:18px; width:100%;">
 					{#if selectedToolId === 'braindump'}
-						<BrainDump mood={mood} on:done={onFinished} />
+						<BrainDump mood={mood} on:done={onFinished} on:back={backToPicker} />
 					{:else if selectedToolId === 'healing'}
 						<Healing mood={mood} on:back={backToPicker} />
 					{/if}
@@ -469,7 +469,7 @@
 				<h2>Nice work!</h2>
 				<p class="small">You can always do another check-in anytime.</p>
 				<div class="actions" style="justify-content:center; margin-top:12px;">
-					<button class="btn btn-primary" on:click={backToPicker}>Start Another</button>
+					<button class="btn btn-primary" on:click={backToPicker}>Home</button>
 				</div>
 			</div>
 		{/if}
