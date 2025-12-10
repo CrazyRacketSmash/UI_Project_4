@@ -1,9 +1,12 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
+  import  music  from '../music/Relaxing-ambient-music.mp3';
   const dispatch = createEventDispatcher();
 
-  let audioEl;
-  let isPlaying = false;
+  let audioElMusic;
+  let audioElBirds;
+  let isPlayingMusic = false;
+  let isPlayingBirds = false;
   let audioError = false;
 
   let showInitialMessage = true;
@@ -34,20 +37,8 @@
   ];
 
   onMount(() => {
-    // Auto play sound
-    if (audioEl) {
-      const playPromise = audioEl.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            isPlaying = true;
-          })
-          .catch(() => {
-            // Browser blocked autoplay or audio failed to load
-            isPlaying = false;
-          });
-      }
-    }
+    // Auto play both sounds
+    playBothAudios();
 
     // Hide initial message after 8 seconds
     setTimeout(() => {
@@ -74,27 +65,82 @@
     }, 9500); // 8000 initial delay + 1500 fade-out duration
   });
 
+  function playBothAudios() {
+    const playMusic = audioElMusic?.play();
+    const playBirds = audioElBirds?.play();
+
+    if (playMusic !== undefined) {
+      playMusic
+        .then(() => {
+          isPlayingMusic = true;
+        })
+        .catch(() => {
+          isPlayingMusic = false;
+        });
+    }
+
+    if (playBirds !== undefined) {
+      playBirds
+        .then(() => {
+          isPlayingBirds = true;
+        })
+        .catch(() => {
+          isPlayingBirds = false;
+        });
+    }
+  }
+
   function toggleAudio() {
-    if (!audioEl) return;
-    if (audioEl.paused) {
-      audioEl.play().then(() => {
-        isPlaying = true;
+    if (!audioElMusic || !audioElBirds) return;
+
+    // Toggle both together
+    if (isPlayingMusic || isPlayingBirds) {
+      audioElMusic.pause();
+      audioElBirds.pause();
+      isPlayingMusic = false;
+      isPlayingBirds = false;
+    } else {
+      playBothAudios();
+    }
+  }
+
+  function toggleMusic() {
+    if (!audioElMusic) return;
+    if (audioElMusic.paused) {
+      audioElMusic.play().then(() => {
+        isPlayingMusic = true;
       }).catch(() => {
         audioError = true;
       });
     } else {
-      audioEl.pause();
-      isPlaying = false;
+      audioElMusic.pause();
+      isPlayingMusic = false;
+    }
+  }
+
+  function toggleBirds() {
+    if (!audioElBirds) return;
+    if (audioElBirds.paused) {
+      audioElBirds.play().then(() => {
+        isPlayingBirds = true;
+      }).catch(() => {
+        audioError = true;
+      });
+    } else {
+      audioElBirds.pause();
+      isPlayingBirds = false;
     }
   }
 
   function onAudioError() {
     audioError = true;
-    isPlaying = false;
+    isPlayingMusic = false;
+    isPlayingBirds = false;
   }
 
   function back() {
-    if (audioEl) audioEl.pause();
+    if (audioElMusic) audioElMusic.pause();
+    if (audioElBirds) audioElBirds.pause();
     dispatch('back');
   }
 </script>
@@ -348,9 +394,22 @@
     </svg>
   </div>
 
-  <!-- Ambient audio -->
+  <!-- Music -->
   <audio
-    bind:this={audioEl}
+    bind:this={audioElMusic}
+    loop
+    on:error={onAudioError}
+    autoplay
+    muted={false}
+    playsinline
+  >
+    <source src={music} type="audio/mpeg" />
+    Your browser doesn't support the audio element.
+  </audio>
+
+  <!-- Birds Chirping -->
+  <audio
+    bind:this={audioElBirds}
     loop
     on:error={onAudioError}
     autoplay
@@ -360,14 +419,26 @@
     <source src="https://www.freesoundslibrary.com/wp-content/uploads/2022/01/forest-birds-sound-effect-relaxing-nature-ambience.mp3" type="audio/mpeg" />
     <source src="https://orangefreesounds.com/wp-content/uploads/2025/06/Morning-birds-chirping-sound-effect.mp3" type="audio/mpeg" />
     <source src="https://orangefreesounds.com/wp-content/uploads/2016/05/Chirping-birds.mp3" type="audio/mpeg" />
-    Your browser doesn't support the <code>audio</code> element.
+    Your browser doesn't support the audio element.
   </audio>
 
   <!-- Controls overlay -->
   <div class="controls">
-    <button class="btn btn-audio" on:click={toggleAudio} title={isPlaying ? "Pause audio" : "Play audio"}>
-      {audioError ? '❌' : (isPlaying ? '🔊' : '🔇')}
+    <!-- Master toggle both -->
+    <button class="btn btn-audio" on:click={toggleAudio} title={(isPlayingMusic || isPlayingBirds) ? "Pause all" : "Play all"}>
+      {audioError ? '❌' : (isPlayingMusic || isPlayingBirds ? '🔊' : '🔇')}
     </button>
+
+    <!-- Music toggle -->
+    <button class="btn btn-audio btn-secondary" on:click={toggleMusic} title={isPlayingMusic ? "Pause music" : "Play music"}>
+      {isPlayingMusic ? '🎵' : '🔇'}
+    </button>
+
+    <!-- Birds toggle -->
+    <button class="btn btn-audio btn-secondary" on:click={toggleBirds} title={isPlayingBirds ? "Pause birds" : "Play birds"}>
+      {isPlayingBirds ? '🐦' : '🔇'}
+    </button>
+
     {#if audioError}
       <span class="small" style="color:#666;">Audio unavailable</span>
     {/if}
@@ -931,6 +1002,18 @@
   .btn-audio:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-secondary {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
   }
 
   .btn-back {
